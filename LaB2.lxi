@@ -1,0 +1,114 @@
+%%
+
+
+[a-zA-Z]*[0-9]? {pos=addToST(yytext);addToPIF(0,pos);}
+([-,+])?[1-9][0-9]* {position=addToST(yytext);addToPIF(1,pos);}  
+"int"  {addToPIF(1,-1);}
+"float"  {addToPIF(2,-1);}
+"double"  {addToPIF(3,-1);}
+"char"  {addToPIF(4,-1);}
+"if"  {addToPIF(5,-1);}
+"while"  {addToPIF(6,-1);}
+"for"  {addToPIF(7,-1);}
+"switch"  {addToPIF(8,-1);}
+"case"  {addToPIF(9,-1);}
+"printf"  {addToPIF(10,-1);}
+"("  {addToPIF(11,-1);}
+")" {addToPIF(12,-1);} 
+"{" {addToPIF(13,-1);} 
+"}"  {addToPIF(14,-1);}
+"+" {addToPIF(15,-1);}
+"-"  {addToPIF(16,-1);}
+"*"  {addToPIF(17,-1);}
+"/"  {addToPIF(18,-1);}
+"%"  {addToPIF(19,-1);}
+"&"  {addToPIF(20,-1);}
+"="  {addToPIF(21,-1);}
+"!="  {addToPIF(22,-1);}
+"<"  {addToPIF(23,-1);}
+"<="  {addToPIF(24,-1);}
+">"  {addToPIF(25,-1);}
+">="  {addToPIF(26,-1);}
+"<" {addToPIF(27,-1);} 
+"==" {addToPIF(28,-1);} 
+"&&" {addToPIF(29,-1);} 
+"||" {addToPIF(30,-1);} 
+
+%%
+
+int pos,position;
+typedef struct{
+    char nameVar[30];
+    int code;
+}ST;
+
+typedef struct{
+    int code;
+    int posInST;
+}PIF; 
+
+
+ST stTable[100];
+PIF pifTable[100];
+int PIFlength=0;
+int STlength=0;
+
+void addToPIF(int code,int poz_in_ST)
+{
+    strcpy(pifTable[PIFlength].code,code);
+    strcpy(pifTable[PIFlength].posInST,poz_in_ST);
+    PIFlength++;
+}
+
+
+int findinST(char name[])
+{
+    for(int i=0;i<STlength;i++)
+        if(strcmp(stTable[i].nameVar,name)==0)
+            return i;
+    return -1;
+}
+int addToST(char name[])
+{
+    int idx=findinST(name);
+    if(idx==-1)
+    {
+        strcpy(stTable[STlength].nameVar,name);
+        STlength++;
+        return idx;
+    }
+}
+
+void printST()
+{
+    printf("The ST: \n");
+    for(int i=0;i<STlength;i++)
+    {
+        printf("%d. %d | %s \n",i,stTable[i].code,stTable[i].nameVar);
+    }
+}
+void printPIF()
+{
+    printf("PIF:\n");
+    for(int i=0;i<PIFlength;i++)
+        printf("%d | %s \n",pifTable[i].code,pifTable[i].posInST);
+}
+
+
+main( argc, argv )
+int argc;
+char **argv;
+    {
+        ++argv, --argc;	/* skip over program name */
+        if ( argc > 0 )
+            yyin = fopen( argv[0], "r" );
+        else
+            yyin = stdin;
+    yylex();
+    printST();
+    printPIF();
+    }
+
+#ifndef yywrap
+   yywrap() { return 1; }
+   #endif
