@@ -1,0 +1,10 @@
+p q r s
+1 0 2 3
+7
+p q A
+p s C
+q r B
+q s F
+r p E
+s q G
+s r D
